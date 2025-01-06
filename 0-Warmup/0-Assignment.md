@@ -30,4 +30,4 @@ Please provide answers to these questions using markdown notation and place them
 
 
 5. Briefly describe any concerns you might be having with being successful in this class (if any).
-* Overlapping Assignment Due Dates with other classes
+* I dont have any concerns with being successful in this class.
