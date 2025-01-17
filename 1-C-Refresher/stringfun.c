@@ -32,7 +32,7 @@ int setup_buff(char *buff, char *user_str, int len){
                 *dst++ = *src; // Copy non-whitespace character
                 user_str_len++;
             } else {
-                return -1; // Error: User supplied string is too large
+                return -1; 
             }
         }
         src++; // Move to the next character
@@ -71,11 +71,11 @@ int count_words(char *buff, int len, int str_len) {
                 in_word = 1; // Set flag to indicate we are inside a word
             }
         } else {
-            in_word = 0; // We've encountered a delimiter
+            in_word = 0; 
         }
     }
 
-    return count; // Return total number of words counted
+    return count; 
 }
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
