@@ -16,43 +16,52 @@ int  count_words(char *, int, int);
 
 
 int setup_buff(char *buff, char *user_str, int len){
-    //TODO: #4:  Implement the setup buff as per the directions
     int user_str_len = 0; 
     char *src = user_str; 
     char *dst = buff;    
+    int last_non_space = -1;
 
     while (*src != '\0') { 
-        if (*src == ' ' || *src == '\t') { // Check for whitespace
-            if (user_str_len > 0 && *(dst - 1) != ' ') {
-                *dst++ = ' '; // Add a single space if not already added
-                user_str_len++;
+        if (*src != ' ' && *src != '\t') {
+            if (user_str_len >= len) {
+                return -1;  
             }
-        } else {
-            if (user_str_len < len) { 
-                *dst++ = *src; // Copy non-whitespace character
-                user_str_len++;
-            } else {
-                return -1; 
+            *dst++ = *src;
+            user_str_len++;
+            last_non_space = user_str_len;
+        } else if (user_str_len > 0 && *(dst-1) != ' ') {
+            if (user_str_len >= len) {
+                return -1;  
             }
+            *dst++ = ' ';
+            user_str_len++;
         }
-        src++; // Move to the next character
+        src++;
     }
 
+    if (last_non_space != -1 && last_non_space < user_str_len) {
+        user_str_len = last_non_space;
+        dst = buff + user_str_len;
+    }
+
+    // Fill the rest with dots
     while (user_str_len < len) {
-        *dst++ = '.'; // Fill remaining buffer with dots
+        *dst++ = '.';
         user_str_len++;
     }
 
-    return user_str_len; // Return length of processed string
+    return user_str_len;
 }
+
+
     
 
 void print_buff(char *buff, int len){
-    printf("Buffer:  ");
+    printf("Buffer:  [");
     for (int i=0; i<len; i++){
         putchar(*(buff+i));
     }
-    putchar('\n');
+    printf("]\n");
 }
 
 void usage(char *exename){
@@ -67,52 +76,62 @@ int count_words(char *buff, int len, int str_len) {
     for (int i = 0; i < str_len; i++) {
         if (*(buff + i) != ' ' && *(buff + i) != '.') { // Only check for spaces and dots
             if (!in_word) {
-                count++; // Found a new word
-                in_word = 1; // Set flag to indicate we are inside a word
+                count++; 
+                in_word = 1; 
             }
         } else {
             in_word = 0; 
         }
     }
-
     return count; 
 }
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
 
 void reverse_string(char *buff, int str_len) {
-    printf("Reversed String: ");
-    for (int i = str_len - 1; i >= 0; i--) {
-        if (*(buff + i) != '.') { // Do not include dots in the output
-            putchar(*(buff + i));
-        }
+    char temp;
+    int start = 0;
+    int end = str_len - 1;
+
+    // Find the last non-dot character
+    while (end >= 0 && buff[end] == '.') {
+        end--;
     }
-    putchar('\n');
+
+    // Reverse the string in place
+    while (start < end) {
+        temp = buff[start];
+        buff[start] = buff[end];
+        buff[end] = temp;
+        start++;
+        end--;
+    }
 }
+
 
 void print_words(char *buff, int len, int str_len) {
     printf("Word Print\n");
     printf("----------\n");
     
-    int word_index = 1;
+    int word_count = 0;
     char *word_start = buff;
     
     for (int i = 0; i < str_len; i++) {
-        if (*(buff + i) == ' ' || *(buff + i) == '.') { // End of a word
-            if (word_start != (buff + i)) { // Ensure it's not an empty word
-                printf("%d. ", word_index++);
-                printf("%.*s (%d)\n", (int)(buff + i - word_start), word_start, (int)(buff + i - word_start));
+        if (*(buff + i) == ' ' || *(buff + i) == '.') {
+            if (word_start != (buff + i)) {
+                printf("%d. %.*s(%d)\n", ++word_count, (int)(buff + i - word_start), word_start, (int)(buff + i - word_start));
             }
-            word_start = buff + i + 1; // Move to the start of the next word
+            word_start = buff + i + 1;
         }
     }
 
-    // Handle the last word if there is no trailing space or dot
-    if (word_start < buff + str_len) { 
-        printf("%d. ", word_index++);
-        printf("%s (%d)\n", word_start, (int)(buff + str_len - word_start));
+    if (word_start < buff + str_len) {
+        printf("%d. %s(%d)\n", ++word_count, word_start, (int)(buff + str_len - word_start));
     }
+
+    printf("\nNumber of words returned: %d\n", word_count);
 }
+
 
 
 int main(int argc, char *argv[]){
@@ -198,22 +217,22 @@ int main(int argc, char *argv[]){
             break;
 
         case 'w':
-            print_words(buff, BUFFER_SZ, user_str_len); 
+            print_words(buff, BUFFER_SZ, user_str_len);
             break;
 
-    case 'x':
-        if (argc != 5) { 
-            usage(argv[0]);
-            exit(1);
-        }
-        printf("Not Implemented!\n");
-        exit(3); // Return an error code indicating that the feature is not implemented
-
-
-            default:
+        case 'x':
+            if (argc != 5) { 
                 usage(argv[0]);
                 exit(1);
-        }
+            }
+            printf("Not Implemented!\n");
+            exit(3); 
+
+
+                default:
+                    usage(argv[0]);
+                    exit(1);
+            }
 
         //TODO:  #6 Dont forget to free your buffer before exiting
         print_buff(buff,BUFFER_SZ);
